@@ -35,7 +35,6 @@ const toPage = (url : string) => {
   .slog {
     display: flex;
     width: 875px;
-    height: 65px;
     background: linear-gradient(to left, rgba(255, 171, 27, 0.3), rgba(251, 230, 137, 0.3));
     margin-top: 105px;
     border-radius: 33px;

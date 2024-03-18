@@ -4,7 +4,7 @@
       <div :class="{'version-text-selected': selectedVersion == 1, 'version-text': selectedVersion == 2}" @click="changeVersion(1)">GLM-3</div>
       <div :class="{'version-text-selected': selectedVersion == 2, 'version-text': selectedVersion == 1}" @click="changeVersion(2)">CLM-4</div>
     </div>
-    <div class="container">
+    <div class="container"  ref="scrollContainer">
       <div class="hello-text">
         <div class="icon" />
         <div class="text">
@@ -26,15 +26,28 @@
       </div>
     </div>
     <div class="chat-input">
-      <textarea class="chat-input-text" v-model="userInput" @keyup.enter="sendMessage" placeholder="请输入你的问题" />
+      <textarea
+          class="chat-input-text"
+          v-model="userInput"
+          @keyup.enter="sendMessage"
+          placeholder="请输入你的问题"
+          :disabled="!sendMessageNow"/>
       <div class="submit"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
+import {nextTick, ref} from 'vue';
+import type { Ref } from 'vue';
 
+const scrollContainer: Ref<HTMLDivElement | null> = ref(null);
+const sendMessageNow = ref(true);
+const scrollToBottom = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+  }
+};
 interface Message {
   text: string,
 }
@@ -58,41 +71,44 @@ const userInput = ref<string>('');
 const getBotResponse = async (input: string) => {
   try {
     const content = JSON.stringify({prompt: input});
-    return await fetch('https://bb8f-111-202-60-158.ngrok-free.app', {
+    const data =  (await fetch('http://localhost:8080/user/getMessage', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: content,
         }
-    );
+    )).text();
+    return data;
   } catch (error) {
     console.log(error);
   }
 }
-function setCursorStatus(dom, status) {
-  const classList = {
-    loading: 'typing blinker',
-    typing: 'typing',
-    end: '',
-  }
-  dom.className = classList[status]
-}
-const sendMessage = () => {
-  const reply = '很抱歉听到您的宠物生病了。在这种情况下，您可能需要尽快采取一些措施来帮助它。首先，您应该尽快联系兽医，描述您的宠物的症状并尽快安排一个预约。兽医将能够提供专业的建议和治疗方案。\n' +
-      '\n' +
-      '在等待就医的过程中，您可以确保您的宠物有足够的水和舒适的环境休息。如果它不愿意吃东西，不要强迫它，但确保它有食物可供选择。\n' +
-      '\n' +
-      '请记住，对宠物的健康问题要尽早处理，这通常可以帮助它们更快地康复。祝您的宠物早日康复！'
-  const formattedReply = reply.replace(/\n/g, '<br>');
-  if (userInput.value.trim() === "") return;
-
+const sendMessage = async () => {
+  if (!sendMessageNow.value) return;
+  sendMessageNow.value = false;
+  const reply = await getBotResponse(userInput.value);
+  console.log(reply);
+  const formattedReply = (reply as string).replace(/\n/g, '<br>');
   chatHistory.value.push({ text: userInput.value});
-
-  const resp = getBotResponse(userInput.value);
-  chatHistory.value.push({text: formattedReply})
-  const index = chatHistory.value.length / 2;
-  const bot = document.getElementsByClassName(`bot-message:nth-child(${index})`);
+  // 打字机效果
+  let index = 0;
+  chatHistory.value.push({text: ""});
+  const intervalId = setInterval(() => {
+    if (index < formattedReply.length) {
+      chatHistory.value[chatHistory.value.length - 1].text += formattedReply[index];
+      index++;
+      nextTick(() => {
+        scrollToBottom()
+      });
+    } else {
+      clearInterval(intervalId);
+      nextTick(() => {
+        scrollToBottom()
+      });
+      sendMessageNow.value = true;
+    }
+  }, 20);
   userInput.value = "";
 }
 </script>
@@ -103,6 +119,7 @@ const sendMessage = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
   .version {
     width: 440px;
     height: 65px;
@@ -134,8 +151,8 @@ const sendMessage = () => {
     display: flex;
     flex-direction: column;
     align-items: start;
-    height: 765px;
-    width: 50vw;
+    height: 55vh;
+    width: 60vw;
     margin-top: 47px;
     overflow-y: auto;
     scrollbar-width: thin; /* 设置滚动条的宽度 */
@@ -204,12 +221,10 @@ const sendMessage = () => {
         overflow: hidden;
         font-weight: 500;
         font-size: 20px;
-        white-space: nowrap;
         animation: typing 3s forwards;
         margin-top: 5px;
         margin-left: 50px;
-        border-radius: 15px;
-        padding: 20px;
+        padding: 10px;
       }
       .avatar-bot {
         background-image: url("@/images/hello_icon.png");
@@ -221,7 +236,6 @@ const sendMessage = () => {
       }
       .bot-message {
         margin-top: 5px;
-        width: 100%;
         margin-left: 50px;
         font-size: 18px;
         box-shadow: 11px 13px 28px 0 rgba(0, 0, 0, 0.03);

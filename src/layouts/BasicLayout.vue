@@ -15,7 +15,7 @@
 .basic {
   background-image: url("@/images/indexBackgournd.png");
   background-size: cover;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
 }
 .content {
