@@ -1,8 +1,8 @@
 <template>
   <div class="chat-container">
     <div class="version">
-      <div :class="{'version-text-selected': selectedVersion == 1, 'version-text': selectedVersion == 2}" @click="changeVersion(1)">GLM-3</div>
-      <div :class="{'version-text-selected': selectedVersion == 2, 'version-text': selectedVersion == 1}" @click="changeVersion(2)">CLM-4</div>
+      <div :class="{'version-text-selected': selectedVersion == 1, 'version-text': selectedVersion == 2}" @click="changeVersion(1)">疾病咨询</div>
+      <div :class="{'version-text-selected': selectedVersion == 2, 'version-text': selectedVersion == 1}" @click="changeVersion(2)">学习模式</div>
     </div>
     <div class="container"  ref="scrollContainer">
       <div class="hello-text">
@@ -12,7 +12,7 @@
           <div class="text2">借助最先进的技术，我们为您提供精准的诊断服务</div>
           <div class="text3">试试说下以下例子：</div>
           <div class="case">
-            <div class="case1" v-for="introduce in introduces" :key="introduce.text">
+            <div class="case1" v-for="introduce in s" :key="introduce.text">
               <div class="choose">{{introduce.text}}</div>
               <div class="subscribe">{{introduce.subscribe}}</div>
             </div>
@@ -21,7 +21,7 @@
       </div>
       <div class="message" v-for="(message, index) in chatHistory" :key="index" >
         <div :class="{'avatar-user': index % 2 == 0, 'avatar-bot': index % 2 != 0}" />
-        <div class="user-message" v-html="message.text">
+        <div class="user-message" v-html="message">
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
           v-model="userInput"
           @keyup.enter="sendMessage"
           placeholder="请输入你的问题"
-          :disabled="!sendMessageNow"/>
+          :disabled="sendMessageNow"/>
       <div class="submit"></div>
     </div>
   </div>
@@ -40,75 +40,50 @@
 <script setup lang="ts">
 import {nextTick, ref} from 'vue';
 import type { Ref } from 'vue';
+import {BotService} from "@/action/BotService";
+import {introduces} from '@/assets/text.json';
 
+const s = introduces; // 页面上的数据
 const scrollContainer: Ref<HTMLDivElement | null> = ref(null);
-const sendMessageNow = ref(true);
+const sendMessageNow = ref(false); // 记录当前是否正在发送消息
+
 const scrollToBottom = () => {
+  // 滚动到底部
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
   }
 };
-interface Message {
-  text: string,
-}
+
 const selectedVersion = ref(1);
 const changeVersion = (index : number) => {
   selectedVersion.value = index;
 }
-interface Introduce {
-  text: string;
-  subscribe: string;
-}
-const introduces = ref<Introduce[]>([
-  {text: '虚拟宠物健康助手', subscribe: '随时随地关爱宠物健康! 通过用户提供的宠物健康数据和症状描述，虚拟宠物健康助手能够快速识别潜在的健康问题，并提供初步的诊断建议。' },
-  {text: '宠物疾病即时查询', subscribe: '快速准确，了解您宠物的健康状况: 允许直接查询病症相关信息，即时查询并能够迅速匹配并提供详细的疾病信息、症状描述、推荐的\n' +
-        '行动方案以及预防措施。' },
-  {text: '宠物健康教育与咨询服务', subscribe: '提升宠物主人的健康意识和知识，提供丰富的宠物健康和护理知识库，包括常见疾病的症状、预防和治疗方法等。宠物主人还可以通过平台\n' +
-        '与兽医或宠物健康专家进行实时咨询，获得专业的建议和支持。'}
-]);
-const chatHistory = ref<Message[]>([]);
+const chatHistory = ref<string[]>([]);
 const userInput = ref<string>('');
-const getBotResponse = async (input: string) => {
-  try {
-    const content = JSON.stringify({prompt: input});
-    const data =  (await fetch('http://localhost:8080/user/getMessage', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: content,
-        }
-    )).text();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-}
 const sendMessage = async () => {
-  if (!sendMessageNow.value) return;
   sendMessageNow.value = false;
-  const reply = await getBotResponse(userInput.value);
-  console.log(reply);
-  const formattedReply = (reply as string).replace(/\n/g, '<br>');
-  chatHistory.value.push({ text: userInput.value});
+  chatHistory.value.push(userInput.value);
+  let reply = await BotService.getBotMessage(userInput.value);
+  const formattedReply = (reply as string)
+      .replace(/\n/g, '<br>');
+
   // 打字机效果
   let index = 0;
-  chatHistory.value.push({text: ""});
+  chatHistory.value.push("");
   const intervalId = setInterval(() => {
     if (index < formattedReply.length) {
-      chatHistory.value[chatHistory.value.length - 1].text += formattedReply[index];
+      chatHistory.value[chatHistory.value.length - 1] += formattedReply[index];
       index++;
       nextTick(() => {
         scrollToBottom()
       });
     } else {
       clearInterval(intervalId);
-      nextTick(() => {
-        scrollToBottom()
-      });
       sendMessageNow.value = true;
     }
-  }, 20);
+  }, 30);
+
+  // 清空 user 输入
   userInput.value = "";
 }
 </script>
@@ -217,6 +192,13 @@ const sendMessage = async () => {
         border-radius: 45px;
         margin-left: 5px;
       }
+      .avatar-user::after {
+        margin-left: 70px;
+        content: '我';
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 40px;
+      }
       .user-message {
         overflow: hidden;
         font-weight: 500;
@@ -284,6 +266,9 @@ const sendMessage = async () => {
     .chat-input-text::-webkit-scrollbar-thumb {
       background: rgb(255, 171, 27);
       border-radius: 5px;
+    }
+    .chat-input-text:disabled {
+      background-color: white;
     }
     .submit {
       width: 47px;
