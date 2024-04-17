@@ -64,6 +64,7 @@ const sendMessage = async () => {
   sendMessageNow.value = false;
   chatHistory.value.push(userInput.value);
   let reply = await BotService.getBotMessage(userInput.value);
+  userInput.value = "";
   const formattedReply = (reply as string)
       .replace(/\n/g, '<br>');
 
@@ -81,10 +82,7 @@ const sendMessage = async () => {
       clearInterval(intervalId);
       sendMessageNow.value = true;
     }
-  }, 30);
-
-  // 清空 user 输入
-  userInput.value = "";
+  }, 30)
 }
 </script>
 
