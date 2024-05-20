@@ -1,29 +1,25 @@
 <template>
   <div class="home">
-    <img src="@/images/indexTitle.png" alt="1" class="title">
+    <img src="@/images/indexTitle.png" alt="1" class="title" />
     <div class="slog">
       <div class="text1">让沟通更简单</div>
       <div class="text2">借助最先进的技术，我们为您提供精准的诊断服务</div>
     </div>
-    <div class="text">高效   易于集成   准确</div>
+    <div class="text">高效 易于集成 准确</div>
     <div class="icons">
-      <div class="start" @click="toPage('/user/login')">立即使用</div>
-      <div class="test" @click="toPage('/user/main')">免费试用</div>
+      <router-link class="start" to="/user/login">立即使用</router-link>
+      <router-link class="test" to="/user/chat">免费试用</router-link>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {useRouter} from "vue-router";
-
-const router = useRouter();
-const toPage = (url : string) => {
-  router.push(url);
-}
+import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
 .home {
+  height: 92vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -72,15 +68,15 @@ const toPage = (url : string) => {
     .start {
       width: 279px;
       height: 93px;
-      background-image: url("@/images/startBackground.png");
+      background-image: url('@/images/startBackground.png');
       font-size: 40px;
       color: rgb(255, 255, 255);
-      line-height: 93px ;
+      line-height: 93px;
       text-align: center;
       cursor: pointer;
     }
     .start::after {
-      content: "";
+      content: '';
       display: inline-block;
       margin-top: 9px;
       width: 33px; /* 宽度 */
@@ -88,13 +84,13 @@ const toPage = (url : string) => {
       margin-right: auto;
       background-color: rgba(255, 255, 255, 0.6);
       border-radius: 33px;
-      background-image: url("@/images/icon.png");
+      background-image: url('@/images/icon.png');
       background-repeat: no-repeat;
       background-position: center;
       margin-left: 17px;
     }
     .test {
-      background-image: url("@/images/icon2.png");
+      background-image: url('@/images/icon2.png');
       width: 279px;
       height: 93px;
       font-size: 40px;
@@ -106,15 +102,14 @@ const toPage = (url : string) => {
       position: relative;
     }
     .test::after {
-      content: " ";
+      content: ' ';
       position: absolute;
       top: -10px;
       right: -10px;
-      background-image: url("@/images/hot.png");
+      background-image: url('@/images/hot.png');
       width: 45px;
       height: 51px;
     }
   }
-
 }
 </style>

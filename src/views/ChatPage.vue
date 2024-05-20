@@ -1,10 +1,26 @@
 <template>
   <div class="chat-container">
     <div class="version">
-      <div :class="{'version-text-selected': selectedVersion == 1, 'version-text': selectedVersion == 2}" @click="changeVersion(1)">疾病咨询</div>
-      <div :class="{'version-text-selected': selectedVersion == 2, 'version-text': selectedVersion == 1}" @click="changeVersion(2)">学习模式</div>
+      <div
+        :class="{
+          'version-text-selected': selectedVersion == 1,
+          'version-text': selectedVersion == 2
+        }"
+        @click="changeVersion(1)"
+      >
+        疾病咨询
+      </div>
+      <div
+        :class="{
+          'version-text-selected': selectedVersion == 2,
+          'version-text': selectedVersion == 1
+        }"
+        @click="changeVersion(2)"
+      >
+        学习模式
+      </div>
     </div>
-    <div class="container"  ref="scrollContainer">
+    <div class="container" ref="scrollContainer">
       <div class="hello-text">
         <div class="icon" />
         <div class="text">
@@ -13,78 +29,77 @@
           <div class="text3">试试说下以下例子：</div>
           <div class="case">
             <div class="case1" v-for="introduce in s" :key="introduce.text">
-              <div class="choose">{{introduce.text}}</div>
-              <div class="subscribe">{{introduce.subscribe}}</div>
+              <div class="choose">{{ introduce.text }}</div>
+              <div class="subscribe">{{ introduce.subscribe }}</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="message" v-for="(message, index) in chatHistory" :key="index" >
-        <div :class="{'avatar-user': index % 2 == 0, 'avatar-bot': index % 2 != 0}" />
-        <div class="user-message" v-html="message">
-        </div>
+      <div class="message" v-for="(message, index) in chatHistory" :key="index">
+        <div :class="{ 'avatar-user': index % 2 == 0, 'avatar-bot': index % 2 != 0 }" />
+        <div class="user-message" v-html="message"></div>
       </div>
     </div>
     <div class="chat-input">
       <textarea
-          class="chat-input-text"
-          v-model="userInput"
-          @keyup.enter="sendMessage"
-          placeholder="请输入你的问题"
-          :disabled="sendMessageNow"/>
+        class="chat-input-text"
+        v-model="userInput"
+        @keyup.enter="sendMessage"
+        placeholder="请输入你的问题"
+        :disabled="sendMessageNow"
+      />
       <div class="submit"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {nextTick, ref} from 'vue';
-import type { Ref } from 'vue';
-import {BotService} from "@/action/BotService";
-import {introduces} from '@/assets/text.json';
+import { nextTick, ref } from 'vue'
+import type { Ref } from 'vue'
+import { BotService } from '@/action/BotService'
+import { introduces } from '@/assets/text.json'
 
-const s = introduces; // 页面上的数据
-const scrollContainer: Ref<HTMLDivElement | null> = ref(null);
-const sendMessageNow = ref(false); // 记录当前是否正在发送消息
+const s = introduces // 页面上的数据
+const scrollContainer: Ref<HTMLDivElement | null> = ref(null)
+const sendMessageNow = ref(false) // 记录当前是否正在发送消息
 
 const scrollToBottom = () => {
   // 滚动到底部
   if (scrollContainer.value) {
-    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight
   }
-};
-
-const selectedVersion = ref(1);
-const changeVersion = (index : number) => {
-  selectedVersion.value = index;
 }
-const chatHistory = ref<string[]>([]);
-const userInput = ref<string>('');
+
+const selectedVersion = ref(1)
+const changeVersion = (index: number) => {
+  selectedVersion.value = index
+}
+const chatHistory = ref<string[]>([])
+const userInput = ref<string>('')
 const sendMessage = async () => {
-  sendMessageNow.value = false;
-  chatHistory.value.push(userInput.value);
-  let reply = await BotService.getBotMessage(userInput.value);
-  const formattedReply = (reply as string)
-      .replace(/\n/g, '<br>');
+  sendMessageNow.value = false
+  chatHistory.value.push(userInput.value)
+  let reply = await BotService.getBotMessage(userInput.value)
+  const formattedReply = (reply as string).replace(/\n/g, '<br>')
 
   // 打字机效果
-  let index = 0;
-  chatHistory.value.push("");
+  let index = 0
+  chatHistory.value.push('')
   const intervalId = setInterval(() => {
     if (index < formattedReply.length) {
-      chatHistory.value[chatHistory.value.length - 1] += formattedReply[index];
-      index++;
+      chatHistory.value[chatHistory.value.length - 1] += formattedReply[index]
+      index++
       nextTick(() => {
         scrollToBottom()
-      });
+      })
     } else {
-      clearInterval(intervalId);
-      sendMessageNow.value = true;
+      clearInterval(intervalId)
+      sendMessageNow.value = true
     }
-  }, 30);
+  }, 30)
 
   // 清空 user 输入
-  userInput.value = "";
+  userInput.value = ''
 }
 </script>
 
@@ -144,7 +159,7 @@ const sendMessage = async () => {
       .icon {
         width: 45px;
         height: 45px;
-        background-image: url("@/images/hello_icon.png");
+        background-image: url('@/images/hello_icon.png');
       }
       .text {
         margin-left: 17px;
@@ -209,7 +224,7 @@ const sendMessage = async () => {
         padding: 10px;
       }
       .avatar-bot {
-        background-image: url("@/images/hello_icon.png");
+        background-image: url('@/images/hello_icon.png');
         align-self: start;
         width: 45px;
         height: 45px;
@@ -275,13 +290,12 @@ const sendMessage = async () => {
       height: 47px;
       border-radius: 47px;
       background-color: rgb(255, 171, 27);
-      background-image: url("@/images/submit_icon.png");
+      background-image: url('@/images/submit_icon.png');
       background-repeat: no-repeat;
-      background-position: center ;
+      background-position: center;
       margin-left: 100px;
       cursor: pointer;
     }
   }
 }
-
 </style>
