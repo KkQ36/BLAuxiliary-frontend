@@ -5,11 +5,12 @@
         <a-image width="100%" :src="item.src" class="shopImage" />
         <a-card-meta class="shopCardDescription">
           <template #description>
-            {{ item.title }}<br />
-            {{ item.description }}<br />
-            <p>
-              ￥{{ item.price }} <span>售出{{ item.saledNum }}件</span>
-            </p>
+            <p class="title">{{ item.title }}</p>
+            <p class="description">{{ item.description }}</p>
+            <div class="shopArea">
+              <p class="price">预估价：￥{{ item.price }}</p>
+              <a :href="item.shopHref" class="buyBtn">立即购买</a>
+            </div>
           </template>
         </a-card-meta>
       </a-card>
@@ -43,11 +44,27 @@ const data = toRef(props, 'data')
   }
 
   .shopCardDescription {
-    font-size: 24px;
-    p {
-      font-size: 24px;
-      span {
+    text-align: left;
+    font-size: 20px;
+    .description {
+      color: #aaa;
+      font-size: 15px;
+    }
+    .shopArea {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .price {
+        font-size: 15px;
+      }
+      .buyBtn {
+        width: 5em;
+        color: white;
         font-size: 12px;
+        text-align: center;
+        background-color: rgba(248, 76, 0, 0.7);
+        border-radius: 5px;
       }
     }
   }
