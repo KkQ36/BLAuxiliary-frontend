@@ -1,67 +1,65 @@
 <template>
-    <div class="content">
-      <div class="login-form">
-        <div class="tab">
-          <div
-              :class="{ 'active': activeTab === 1, 'normal': activeTab != 1}"
-              @click="changeActive(1)">
-            手机快速登录</div>
-          <div 
-          :class="{ 'active': activeTab === 2, 'normal': activeTab != 2}"
-          @click="changeActive(2)">
-            账号密码登录</div>
+  <div class="content">
+    <div class="login-form">
+      <div class="tab">
+        <div :class="{ active: activeTab === 1, normal: activeTab != 1 }" @click="changeActive(1)">
+          手机快速登录
         </div>
-        <form class="form" v-if="activeTab == 2">
-          <div class="form-element">
-            <div class="title">用户名</div>
-            <div class="input">
-              <input v-model="form.name" placeholder="用户名/邮箱/手机号">
-            </div>
-          </div>
-          <div class="form-element">
-            <div class="title">密码</div>
-            <div class="input">
-              <input v-model="form.password" placeholder="请输入密码">
-            </div>
-          </div>
-          <div class="button" @click="handleSubmit">登录</div>
-          <a href="#" class="register">注册账户</a>
-        </form>
-        <form class="form" v-else>
-          <div class="form-element">
-            <div class="title">手机号登录</div>
-            <div class="input">
-              <input v-model="form.name" placeholder="请输入手机号码">
-            </div>
-          </div>
-            <div class="form-element">
-              <div class="title">验证码</div>
-              <div class="input">
-                <input v-model="form.name" placeholder="请输入验证码">
-                <a href="#" class="get-code">获取验证码</a>
-              </div>
-          </div>
-          <div class="button">登录</div>
-        </form>
-        <img src="@/images/title.png" class="image"  alt="1"/>
+        <div :class="{ active: activeTab === 2, normal: activeTab != 2 }" @click="changeActive(2)">
+          账号密码登录
+        </div>
       </div>
+      <form class="form" v-if="activeTab == 2">
+        <div class="form-element">
+          <div class="title">用户名</div>
+          <div class="input">
+            <input v-model="form.name" placeholder="用户名/邮箱/手机号" />
+          </div>
+        </div>
+        <div class="form-element">
+          <div class="title">密码</div>
+          <div class="input">
+            <input v-model="form.password" placeholder="请输入密码" />
+          </div>
+        </div>
+        <div class="button" @click="handleSubmit">登录</div>
+        <a href="#" class="register">注册账户</a>
+      </form>
+      <form class="form" v-else>
+        <div class="form-element">
+          <div class="title">手机号登录</div>
+          <div class="input">
+            <input v-model="form.name" placeholder="请输入手机号码" />
+          </div>
+        </div>
+        <div class="form-element">
+          <div class="title">验证码</div>
+          <div class="input">
+            <input v-model="form.name" placeholder="请输入验证码" />
+            <a href="#" class="get-code">获取验证码</a>
+          </div>
+        </div>
+        <div class="button">登录</div>
+      </form>
+      <img src="@/images/title.png" class="image" alt="1" />
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref} from "vue";
-const activeTab = ref(2);
+import { reactive, ref } from 'vue'
+const activeTab = ref(2)
 const form = reactive({
   name: '',
   password: '',
-  isRead: false,
-});
-const changeActive = (index : number) => {
-  activeTab.value = index;
+  isRead: false
+})
+const changeActive = (index: number) => {
+  activeTab.value = index
 }
-const handleSubmit = (data : any) => {
-  console.log(111111);
-};
+const handleSubmit = (data: any) => {
+  console.log(111111)
+}
 </script>
 
 <style scoped lang="scss">
@@ -70,12 +68,12 @@ input {
   outline: none;
 }
 .content {
-  background-image: url("@/images/userLoginBackground.png");
+  height: 100vh;
+  background-image: url('@/images/userLoginBackground.png');
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;
   width: 100%;
-  height: 1100px;
   justify-content: right;
   align-items: center;
 }
@@ -92,7 +90,7 @@ input {
     height: 90px;
     width: 330px;
     color: rgb(153, 153, 153);
-    background-color:  rgba(255, 226, 119, 0.26);
+    background-color: rgba(255, 226, 119, 0.26);
   }
   .active {
     height: 127px;
@@ -140,13 +138,12 @@ input {
     .get-code {
       margin-left: 250px;
       text-decoration: none;
-      color: rgb(255, 171, 27);;
+      color: rgb(255, 171, 27);
     }
     .get-code:visited {
       color: rgb(255, 171, 27);
     }
   }
-
 }
 input::placeholder {
   color: #bbbbbb;
