@@ -22,7 +22,7 @@
     </div>
     <div class="container" ref="scrollContainer">
       <div class="hello-text">
-        <div class="icon" />
+        <div class="icon" @click='toHome()' style='cursor: pointer'/>
         <div class="text">
           <div class="text1">你好！我是百灵辅诊</div>
           <div class="text2">借助最先进的技术，我们为您提供精准的诊断服务</div>
@@ -50,6 +50,9 @@
       />
       <div class="submit"></div>
     </div>
+    <a-button @click='showWindow()'>导出宠物病例单</a-button>
+    <ExportContainer v-model:visible="showFloatingWindow" @close="closeFloatingWindow"/>
+
   </div>
 </template>
 
@@ -58,28 +61,41 @@ import { nextTick, ref } from 'vue'
 import type { Ref } from 'vue'
 import { BotService } from '@/action/BotService'
 import { introduces } from '@/assets/text.json'
+import { useRouter } from 'vue-router'
+import ExportContainer from '@/components/chat/ExportContainer.vue'
 
 const s = introduces // 页面上的数据
 const scrollContainer: Ref<HTMLDivElement | null> = ref(null)
 const sendMessageNow = ref(false) // 记录当前是否正在发送消息
-
+const router = useRouter();
+const showFloatingWindow = ref(false);
+const showWindow = () => {
+  showFloatingWindow.value = true;
+}
 const scrollToBottom = () => {
   // 滚动到底部
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight
   }
 }
-
+const closeFloatingWindow = () => {
+  showFloatingWindow.value = false;
+}
+const toHome = () => {
+  router.push("/");
+}
 const selectedVersion = ref(1)
 const changeVersion = (index: number) => {
   selectedVersion.value = index
 }
 const chatHistory = ref<string[]>([])
 const userInput = ref<string>('')
+let temp = 0;
 const sendMessage = async () => {
-  sendMessageNow.value = false
+  sendMessageNow.value = true
   chatHistory.value.push(userInput.value)
-  let reply = await BotService.getBotMessage(userInput.value)
+  // let reply = await BotService.getBotMessage(userInput.value);
+  let reply = await BotService.getFakeMessage(temp++);
   const formattedReply = (reply as string).replace(/\n/g, '<br>')
 
   // 打字机效果
@@ -94,7 +110,7 @@ const sendMessage = async () => {
       })
     } else {
       clearInterval(intervalId)
-      sendMessageNow.value = true
+      sendMessageNow.value = false
     }
   }, 30)
 

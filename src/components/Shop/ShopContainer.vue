@@ -22,10 +22,6 @@
 import { defineProps, toRef } from 'vue'
 const props = defineProps(['data'])
 const data = toRef(props, 'data')
-// watch(props, () => {
-//   console.log('props', props.data[0].title)
-//   console.log('data', data.value[0].title)
-// })
 </script>
 
 <style lang="scss" scoped>
@@ -41,6 +37,7 @@ const data = toRef(props, 'data')
 
   .shopCards {
     width: 15%;
+    border-radius: 5px !important;
   }
 
   .shopCardDescription {

@@ -2,11 +2,8 @@
   <div class="content">
     <div class="login-form">
       <div class="tab">
-        <div :class="{ active: activeTab === 1, normal: activeTab != 1 }" @click="changeActive(1)">
-          测试码登录
-        </div>
         <div :class="{ active: activeTab === 2, normal: activeTab != 2 }" @click="changeActive(2)">
-          账号密码登录
+          注册
         </div>
       </div>
       <form class="form" v-if="activeTab == 2">
@@ -22,17 +19,13 @@
             <input v-model="form.password" placeholder="请输入密码" />
           </div>
         </div>
-        <div class="button" @click="handleSubmit(0)">登录</div>
-        <router-link class="register" to="/user/register">注册</router-link>
-      </form>
-      <form class="form" v-else>
         <div class="form-element">
-          <div class="title" >测试码登录</div>
+          <div class="title">再次输入密码</div>
           <div class="input">
-            <input v-model="form.invitation" placeholder="请输入测试码" />
+            <input v-model="form.checkedPassword" placeholder="请输入密码" />
           </div>
         </div>
-        <div class="button" @click="handleSubmit(1)">登录</div>
+        <div class="button" @click="handleSubmit">注册</div>
       </form>
       <img src="@/images/title.png" class="image" alt="1" />
     </div>
@@ -50,19 +43,20 @@ const form = reactive({
   name: '',
   password: '',
   invitation: '',
+  checkedPassword: '',
   isRead: false
 })
 const router = useRouter();
 const changeActive = (index: number) => {
   activeTab.value = index
 }
-const handleSubmit = (choose : number) => {
-  let res;
-  if (choose === 0) res = UserService.login(form.name, form.password, "");
-  else if (choose === 1) res = UserService.login("", "", form.invitation);
-  console.log(res)
-  if ((res as boolean)) router.push("/user/chat");
-  else Message.warning("登录失败");
+const handleSubmit = () => {
+  if (form.password !== form.checkedPassword) Message.warning("两次输入的密码不一致");
+  else{
+    UserService.register(form.name, form.password);
+    Message.success("注册成功，请重新登录");
+    router.push("login");
+  }
 }
 </script>
 
@@ -162,7 +156,7 @@ input::placeholder {
   text-align: center;
   line-height: 74px;
   margin-bottom: 12px;
-  margin-top: 94px;
+  margin-top: 20px;
   margin-left: 61px;
   cursor: pointer;
 }
