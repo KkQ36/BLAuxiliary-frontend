@@ -90,10 +90,12 @@ const changeVersion = (index: number) => {
 }
 const chatHistory = ref<string[]>([])
 const userInput = ref<string>('')
+let temp = 0;
 const sendMessage = async () => {
   sendMessageNow.value = true
   chatHistory.value.push(userInput.value)
-  let reply = await BotService.getBotMessage(userInput.value)
+  // let reply = await BotService.getBotMessage(userInput.value);
+  let reply = await BotService.getFakeMessage(temp++);
   const formattedReply = (reply as string).replace(/\n/g, '<br>')
 
   // 打字机效果

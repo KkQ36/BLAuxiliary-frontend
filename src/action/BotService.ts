@@ -1,4 +1,5 @@
 import type {Response} from "../models/BotResponse";
+import chat from "@/assets/botChat.json"
 
 export class BotService {
     public static async getBotMessage(
@@ -19,5 +20,8 @@ export class BotService {
         } catch (error) {
             console.log(error);
         }
+    }
+    public static async getFakeMessage(index : number) {
+      return chat[index];
     }
 }

@@ -1,10 +1,63 @@
 <template>
   <div class="content">
-     用户注册
+    <div class="login-form">
+      <div class="tab">
+        <div :class="{ active: activeTab === 2, normal: activeTab != 2 }" @click="changeActive(2)">
+          注册
+        </div>
+      </div>
+      <form class="form" v-if="activeTab == 2">
+        <div class="form-element">
+          <div class="title">用户名</div>
+          <div class="input">
+            <input v-model="form.name" placeholder="用户名/邮箱/手机号" />
+          </div>
+        </div>
+        <div class="form-element">
+          <div class="title">密码</div>
+          <div class="input">
+            <input v-model="form.password" placeholder="请输入密码" />
+          </div>
+        </div>
+        <div class="form-element">
+          <div class="title">再次输入密码</div>
+          <div class="input">
+            <input v-model="form.checkedPassword" placeholder="请输入密码" />
+          </div>
+        </div>
+        <div class="button" @click="handleSubmit">注册</div>
+      </form>
+      <img src="@/images/title.png" class="image" alt="1" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { reactive, ref } from 'vue'
+import { UserService } from '@/action/UserService'
+import { useRouter } from 'vue-router'
+import { Message } from '@arco-design/web-vue'
+
+const activeTab = ref(2)
+const form = reactive({
+  name: '',
+  password: '',
+  invitation: '',
+  checkedPassword: '',
+  isRead: false
+})
+const router = useRouter();
+const changeActive = (index: number) => {
+  activeTab.value = index
+}
+const handleSubmit = () => {
+  if (form.password !== form.checkedPassword) Message.warning("两次输入的密码不一致");
+  else{
+    UserService.register(form.name, form.password);
+    Message.success("注册成功，请重新登录");
+    router.push("login");
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -103,7 +156,7 @@ input::placeholder {
   text-align: center;
   line-height: 74px;
   margin-bottom: 12px;
-  margin-top: 94px;
+  margin-top: 20px;
   margin-left: 61px;
   cursor: pointer;
 }

@@ -3,7 +3,7 @@
     <div class="login-form">
       <div class="tab">
         <div :class="{ active: activeTab === 1, normal: activeTab != 1 }" @click="changeActive(1)">
-          手机快速登录
+          测试码登录
         </div>
         <div :class="{ active: activeTab === 2, normal: activeTab != 2 }" @click="changeActive(2)">
           账号密码登录
@@ -22,24 +22,17 @@
             <input v-model="form.password" placeholder="请输入密码" />
           </div>
         </div>
-        <div class="button" @click="handleSubmit">登录</div>
+        <div class="button" @click="handleSubmit(0)">登录</div>
         <router-link class="register" to="/user/register">注册</router-link>
       </form>
       <form class="form" v-else>
         <div class="form-element">
-          <div class="title">手机号登录</div>
+          <div class="title" >测试码登录</div>
           <div class="input">
-            <input v-model="form.name" placeholder="请输入手机号码" />
+            <input v-model="form.invitation" placeholder="请输入测试码" />
           </div>
         </div>
-        <div class="form-element">
-          <div class="title">验证码</div>
-          <div class="input">
-            <input v-model="form.name" placeholder="请输入验证码" />
-            <a href="#" class="get-code">获取验证码</a>
-          </div>
-        </div>
-        <div class="button">登录</div>
+        <div class="button" @click="handleSubmit(1)">登录</div>
       </form>
       <img src="@/images/title.png" class="image" alt="1" />
     </div>
@@ -48,17 +41,28 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { UserService } from '@/action/UserService'
+import { useRouter } from 'vue-router'
+import { Message } from '@arco-design/web-vue'
+
 const activeTab = ref(2)
 const form = reactive({
   name: '',
   password: '',
+  invitation: '',
   isRead: false
 })
+const router = useRouter();
 const changeActive = (index: number) => {
   activeTab.value = index
 }
-const handleSubmit = (data: any) => {
-  console.log(111111)
+const handleSubmit = (choose : number) => {
+  let res;
+  if (choose === 0) res = UserService.login(form.name, form.password, "");
+  else if (choose === 1) res = UserService.login("", "", form.invitation);
+  console.log(res)
+  if ((res as boolean)) router.push("/user/chat");
+  else Message.warning("登录失败");
 }
 </script>
 
